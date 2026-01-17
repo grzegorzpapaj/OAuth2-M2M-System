@@ -4,6 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 from jose import jwt
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError
 
 from .database import get_db
 from .models import ClientApp
@@ -61,3 +63,30 @@ async def login_for_access_token(token_data: TokenRequest, db: AsyncSession = De
 
     access_token = create_access_token(data={"sub": client.client_id})
     return {"access_token": access_token, "token_type": "bearer"}
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
+
+async def get_current_client(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Token jest nieważny lub wygasł",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
+    try:
+        # Dekodujemy token
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        client_id: str = payload.get("sub")
+        if client_id is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    # Opcjonalnie: sprawdzamy czy klient nadal istnieje w bazie
+    result = await db.execute(select(ClientApp).where(ClientApp.client_id == client_id))
+    client = result.scalars().first()
+    
+    if client is None:
+        raise credentials_exception
+        
+    return client
