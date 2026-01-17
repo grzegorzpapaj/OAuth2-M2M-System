@@ -1,8 +1,10 @@
 from fastapi import FastAPI
+import asyncio
 from .database import engine, Base
 
 from .auth import router as auth_router 
 from .currency import router as currency_router
+from .tasks import currency_generator
 
 app = FastAPI()
 
@@ -12,6 +14,8 @@ async def startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     print("Tabele gotowe!")
+
+    asyncio.create_task(currency_generator())
 
 app.include_router(auth_router, prefix="/api")
 app.include_router(currency_router, prefix="/api")
