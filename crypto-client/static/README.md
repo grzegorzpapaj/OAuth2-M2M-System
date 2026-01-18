@@ -56,7 +56,7 @@ Administrator przekazuje Ci bezpiecznym kanałem:
 
 Frontend komunikuje się z tymi endpointami crypto-client:
 
-- `POST /api/login` - Logowanie i uzyskanie tokenu JWT
+- `POST /api/token` - Logowanie i uzyskanie tokenu JWT
 - `GET /api/status` - Status uwierzytelnienia
 - `GET /api/currencies` - Wszystkie kursy kryptowalut
 - `GET /api/test-server` - Test połączenia z crypto-server

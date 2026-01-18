@@ -40,7 +40,7 @@ python -m uvicorn crypto_client.main:app --reload --port 8001
 ### Zarządzanie uwierzytelnianiem
 
 - `POST /api/register` - Zarejestruj klienta w crypto-server
-- `POST /api/login` - Zaloguj się i uzyskaj token
+- `POST /api/token` - Zaloguj się i uzyskaj token
 - `POST /api/configure` - Skonfiguruj credentials
 - `GET /api/status` - Sprawdź status uwierzytelnienia
 
@@ -66,7 +66,7 @@ curl -X POST http://localhost:8001/api/register
 ### 2. Zaloguj się (uzyskaj token)
 
 ```bash
-curl -X POST http://localhost:8001/api/login
+curl -X POST http://localhost:8001/api/token
 ```
 
 ### 3. Pobierz kursy walut

@@ -160,7 +160,7 @@ Po zalogowaniu:
 
 | Endpoint | Metoda | Opis |
 |----------|--------|------|
-| `/api/login` | POST | Logowanie (client_id + secret) |
+| `/api/token` | POST | Logowanie (client_id + secret) |
 | `/api/status` | GET | Status uwierzytelnienia |
 | `/api/currencies` | GET | Wszystkie kursy walut |
 | `/api/test-server` | GET | Test połączenia |

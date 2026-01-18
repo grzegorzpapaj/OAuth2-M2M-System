@@ -36,7 +36,7 @@
 
 ### 6. OAuth2 Flow
 - [ ] Rejestracja klienta działa (`POST /api/register`)
-- [ ] Logowanie działa (`POST /api/login`)
+- [ ] Logowanie działa (`POST /api/token`)
 - [ ] Token JWT zwracany poprawnie
 - [ ] Token zawiera pole `exp` (expiration)
 - [ ] Status pokazuje `authenticated: true`
@@ -75,7 +75,7 @@
 ```bash
 # Powinno działać bez błędów
 curl -X POST http://localhost:8001/api/register
-curl -X POST http://localhost:8001/api/login
+curl -X POST http://localhost:8001/api/token
 curl http://localhost:8001/api/currencies
 ```
 - [ ] ✅ Działa
@@ -158,7 +158,7 @@ curl http://localhost:8001/api/currencies/BTC
 
 ### Problem: 401 Unauthorized
 - [ ] Klient zarejestrowany (`POST /api/register`)
-- [ ] Klient zalogowany (`POST /api/login`)
+- [ ] Klient zalogowany (`POST /api/token`)
 - [ ] Token nie wygasł (ważny 120 minut)
 - [ ] Credentials są poprawne
 - [ ] Token przekazywany w nagłówku `Authorization: Bearer`

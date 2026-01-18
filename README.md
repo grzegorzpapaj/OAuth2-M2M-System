@@ -148,7 +148,7 @@ Crypto-Client posiada nowoczesny interfejs webowy dostępny pod adresem **http:/
 
 #### Zarządzanie
 - `POST /api/register` - Zarejestruj w serwerze
-- `POST /api/login` - Zaloguj i uzyskaj token
+- `POST /api/token` - Zaloguj i uzyskaj token
 - `POST /api/configure` - Skonfiguruj credentials
 - `GET /api/status` - Status uwierzytelnienia
 
@@ -250,7 +250,7 @@ docker-compose ps
 ### Błąd 401 Unauthorized
 - Sprawdź credentials (client_id, client_secret)
 - Token wygasa po 120 minutach
-- Użyj `/api/login` aby uzyskać nowy token
+- Użyj `/api/token` aby uzyskać nowy token
 
 ### Port zajęty
 ```bash

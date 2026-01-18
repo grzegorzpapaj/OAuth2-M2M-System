@@ -37,7 +37,7 @@ curl -X POST http://localhost:8001/api/register
 
 #### 3. Zaloguj się (uzyskaj token)
 ```bash
-curl -X POST http://localhost:8001/api/login
+curl -X POST http://localhost:8001/api/token
 ```
 
 #### 4. Pobierz wszystkie kursy walut

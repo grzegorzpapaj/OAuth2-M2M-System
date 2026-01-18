@@ -110,7 +110,7 @@ curl http://localhost:8001/
 curl -X POST http://localhost:8001/api/register
 
 # Zaloguj się
-curl -X POST http://localhost:8001/api/login
+curl -X POST http://localhost:8001/api/token
 
 # Pobierz kursy
 curl http://localhost:8001/api/currencies
@@ -124,7 +124,7 @@ curl http://localhost:8001/api/currencies
 
 1. Otwórz http://localhost:8001/docs
 2. Kliknij `POST /api/register` → Try it out → Execute
-3. Kliknij `POST /api/login` → Try it out → Execute
+3. Kliknij `POST /api/token` → Try it out → Execute
 4. Kliknij `GET /api/currencies` → Try it out → Execute
 5. Zobacz kursy kryptowalut! 🎉
 
@@ -135,7 +135,7 @@ curl http://localhost:8001/api/currencies
 curl -X POST http://localhost:8001/api/register
 
 # 2. Login (uzyskaj token)
-curl -X POST http://localhost:8001/api/login
+curl -X POST http://localhost:8001/api/token
 
 # 3. Pobierz wszystkie kursy
 curl http://localhost:8001/api/currencies
@@ -239,7 +239,7 @@ pip3 install --upgrade -r crypto-client/requirements.txt
 ```bash
 # Zarejestruj ponownie
 curl -X POST http://localhost:8001/api/register
-curl -X POST http://localhost:8001/api/login
+curl -X POST http://localhost:8001/api/token
 ```
 
 ### Problem: Can't connect to server

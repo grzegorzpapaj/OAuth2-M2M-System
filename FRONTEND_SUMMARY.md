@@ -12,7 +12,7 @@
 
 ### 2. **Integracja z Backend** (`crypto-client/main.py`)
 - ✅ Serwowanie statycznych plików
-- ✅ Endpoint `/api/login` do logowania
+- ✅ Endpoint `/api/token` do logowania
 - ✅ Endpoint `/api/currencies` do kursów
 - ✅ Endpoint `/api/status` do statusu
 - ✅ CORS skonfigurowany
@@ -121,7 +121,7 @@ Frontend wyświetla:
 | Endpoint | Metoda | Opis |
 |----------|--------|------|
 | `/` | GET | Frontend (HTML) |
-| `/api/login` | POST | Logowanie (zwraca JWT) |
+| `/api/token` | POST | Logowanie (zwraca JWT) |
 | `/api/status` | GET | Status uwierzytelnienia |
 | `/api/currencies` | GET | Wszystkie kursy |
 | `/api/test-server` | GET | Test połączenia |

@@ -16,6 +16,12 @@ class ClientCredentials(BaseModel):
     admin_secret: Optional[str] = None
 
 
+class TokenRequest(BaseModel):
+    """Model do żądania tokenu"""
+    client_id: str
+    client_secret: str
+
+
 class CurrencyRateResponse(BaseModel):
     """Model odpowiedzi z kursem waluty"""
     symbol: str
@@ -48,18 +54,30 @@ async def register():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/login")
-async def login():
+@router.post("/token")
+async def get_token(request: TokenRequest):
     """
-    Zaloguj się i uzyskaj token od crypto-server
+    Uzyskaj access token od crypto-server (OAuth2 token endpoint)
     """
+    from client_service import ClientService
+    
     try:
-        token = await _client_service.get_access_token()
+        # Utwórz tymczasowy ClientService z podanymi credentials
+        temp_client = ClientService(request.client_id, request.client_secret)
+        token = await temp_client.get_access_token()
+        
+        # Zaktualizuj globalny client service
+        _client_service.client_id = request.client_id
+        _client_service.client_secret = request.client_secret
+        _client_service.access_token = token
+        _client_service.token_expires_at = temp_client.token_expires_at
+        
+        await temp_client.close()
+        
         return {
-            "status": "success",
-            "message": "Pomyślnie uwierzytelniono",
-            "token_preview": f"{token[:20]}...",
-            "expires_at": _client_service.token_expires_at.isoformat() if _client_service.token_expires_at else None
+            "access_token": token,
+            "token_type": "bearer",
+            "expires_in": 7200
         }
     except Exception as e:
         raise HTTPException(status_code=401, detail=f"Błąd uwierzytelniania: {str(e)}")

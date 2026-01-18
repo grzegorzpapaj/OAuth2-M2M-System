@@ -188,7 +188,7 @@
             const clientSecret = document.getElementById('login-client-secret').value;
 
             try {
-                const response = await fetch('/api/login', {
+                const response = await fetch('/api/token', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
