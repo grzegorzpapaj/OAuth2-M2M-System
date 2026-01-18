@@ -59,20 +59,13 @@ async def get_token(request: TokenRequest):
     """
     Uzyskaj access token od crypto-server (OAuth2 token endpoint)
     """
-    from client_service import ClientService
-    
     try:
-        # Utwórz tymczasowy ClientService z podanymi credentials
-        temp_client = ClientService(request.client_id, request.client_secret)
-        token = await temp_client.get_access_token()
-        
-        # Zaktualizuj globalny client service
+        # Zaktualizuj credentials w globalnym client service
         _client_service.client_id = request.client_id
         _client_service.client_secret = request.client_secret
-        _client_service.access_token = token
-        _client_service.token_expires_at = temp_client.token_expires_at
         
-        await temp_client.close()
+        # Uzyskaj token od crypto-server
+        token = await _client_service.get_access_token()
         
         return {
             "access_token": token,
