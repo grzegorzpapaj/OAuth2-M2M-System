@@ -15,7 +15,8 @@ Serwer API dostarczający:
 
 ### 💻 **Crypto-Client**
 Klient implementujący:
-- Automatyczną rejestrację w serwerze
+- **Frontend webowy** - nowoczesny interfejs do logowania i przeglądania kursów
+- Automatyczna rejestracja w serwerze (backend)
 - Uzyskiwanie i odświeżanie JWT tokenów
 - Komunikację z chronionymi endpointami
 - Background task pobierający dane co 10 sekund
@@ -106,30 +107,30 @@ OAuth2-M2M-System/
     ├── config.py            # Konfiguracja
     ├── test_client.py       # Skrypt testowy
     ├── requirements.txt     # Zależności
-    └── README.md           # Dokumentacja klienta
+    ├── README.md           # Dokumentacja klienta
+    └── static/             # Frontend webowy
+        ├── index.html      # SPA z Tailwind CSS
+        └── README.md       # Dokumentacja frontendu
 ```
 
-## 🔑 OAuth2 Flow
+## 🌐 Frontend Webowy
 
-```
-┌─────────────┐                           ┌─────────────┐
-│             │  1. POST /auth/register   │             │
-│             │ ────────────────────────> │             │
-│             │  {client_id, secret}      │             │
-│             │                           │             │
-│             │  2. POST /auth/token      │             │
-│   Client    │ ────────────────────────> │   Server    │
-│             │  {client_id, secret}      │             │
-│             │ <──────────────────────── │             │
-│             │  {access_token, ...}      │             │
-│             │                           │             │
-│             │  3. GET /currency/        │             │
-│             │ ────────────────────────> │             │
-│             │  Authorization: Bearer    │             │
-│             │ <──────────────────────── │             │
-│             │  [{rates}]                │             │
-└─────────────┘                           └─────────────┘
-```
+Crypto-Client posiada nowoczesny interfejs webowy dostępny pod adresem **http://localhost:8001**
+
+### Funkcje frontendu:
+- 🔐 **Logowanie** - używając credentials otrzymanych od administratora
+- 📊 **Dashboard** - przegląd wszystkich kursów kryptowalut
+- 🔄 **Auto-refresh** - automatyczne ładowanie danych po zalogowaniu
+- ✨ **Nowoczesny UI** - Tailwind CSS, gradien ty, animacje
+- 📱 **Responsywny** - działa na desktop i mobile
+
+### Model bezpieczeństwa:
+1. **Administrator** rejestruje klienta na crypto-server (port 8000)
+2. **Administrator** przekazuje credentials użytkownikowi bezpiecznym kanałem
+3. **Użytkownik** loguje się przez frontend (port 8001)
+4. **Frontend** wyświetla dane z serwera
+
+**Więcej:** Zobacz [Frontend README](crypto-client/static/README.md)
 
 ## 📚 API Endpoints
 
@@ -268,7 +269,10 @@ Projekt OAuth2 M2M System
 ---
 
 **⚡ Szybkie linki:**
+- 🌐 [Frontend Webowy](http://localhost:8001) - Panel klienta
+- 📘 [Frontend - Przewodnik Użytkownika](FRONTEND_GUIDE.md) - Kompletny tutorial
 - 📖 [Pełne przykłady](EXAMPLES.md)
 - 🔧 [Konfiguracja klienta](crypto-client/README.md)
+- 🎨 [Dokumentacja techniczna frontendu](crypto-client/static/README.md)
 - 📚 [Swagger UI Server](http://localhost:8000/docs)
 - 📚 [Swagger UI Client](http://localhost:8001/docs)
