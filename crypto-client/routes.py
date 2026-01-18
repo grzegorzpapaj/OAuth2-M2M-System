@@ -13,6 +13,7 @@ class ClientCredentials(BaseModel):
     client_id: str
     client_secret: str
     app_name: Optional[str] = "Crypto Client App"
+    admin_secret: Optional[str] = None
 
 
 class CurrencyRateResponse(BaseModel):
@@ -72,6 +73,8 @@ async def configure_credentials(credentials: ClientCredentials):
     _client_service.client_id = credentials.client_id
     _client_service.client_secret = credentials.client_secret
     _client_service.app_name = credentials.app_name
+    if credentials.admin_secret:
+        _client_service.admin_secret = credentials.admin_secret
     
     # Reset tokenu
     _client_service.access_token = None

@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 import asyncio
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from .database import engine, Base
 
 from .auth import router as auth_router 
@@ -20,6 +22,8 @@ async def startup():
 app.include_router(auth_router, prefix="/api")
 app.include_router(currency_router, prefix="/api")
 
+app.mount("/static", StaticFiles(directory="crypto-server/static"), name="static")
+
 @app.get("/")
 async def root():
-    return {"message": "Server is running nicely!"}
+    return FileResponse("crypto-server/static/index.html")

@@ -33,15 +33,60 @@ async def test_oauth_flow():
         print("\n" + "="*60)
         print("🔐 Test OAuth2 Client Credentials Flow")
         print("="*60)
+
+        # 0. Test zabezpieczenia rejestracji (Admin Secret)
+        print("\n0️⃣  Test zabezpieczenia rejestracji (Zły Admin Secret)...")
+        try:
+            # Konfiguracja z błędnym sekretem
+            await client.post(
+                f"{CLIENT_URL}/api/configure",
+                json={
+                    "client_id": "test-unauthorized",
+                    "client_secret": "secret",
+                    "app_name": "Unauthorized App",
+                    "admin_secret": "WRONG_SECRET"
+                }
+            )
+            
+            # Próba rejestracji powinna się nie udać
+            reg_response = await client.post(f"{CLIENT_URL}/api/register")
+            
+            if reg_response.status_code == 500 and "403" in reg_response.text:
+                print("   ✅ Oczekiwana odmowa dostępu (403 Forbidden)")
+            else:
+                print(f"   ❌ Oczekiwano błędu 403, otrzymano: {reg_response.status_code}")
+                print(f"   📄 Odpowiedź: {reg_response.text}")
+                return False
+                
+        except Exception as e:
+            print(f"   ❌ Błąd podczas testu zabezpieczeń: {e}")
+            return False
+
+        # Przywróć poprawną konfigurację dla dalszych testów
+        await client.post(
+            f"{CLIENT_URL}/api/configure",
+            json={
+                "client_id": "crypto-client-quick",
+                "client_secret": "super-secret-key-123",
+                "app_name": "Quick Test Client",
+                "admin_secret": "super-secret-admin-key"
+            }
+        )
         
         # 1. Rejestracja
-        print("\n1️⃣  Rejestracja klienta...")
+        print("\n1️⃣  Rejestracja klienta (Poprawny Admin Secret)...")
         try:
             reg_response = await client.post(
                 f"{CLIENT_URL}/api/register"
             )
-            print(f"   ✅ Status: {reg_response.status_code}")
-            print(f"   📄 Odpowiedź: {reg_response.json()}")
+            # 200 OK lub 200 z informacją że już istnieje
+            if reg_response.status_code == 200:
+                print(f"   ✅ Status: {reg_response.status_code}")
+                print(f"   📄 Odpowiedź: {reg_response.json()}")
+            else:
+                print(f"   ❌ Błąd rejestracji: {reg_response.status_code}")
+                print(f"   📄 Odpowiedź: {reg_response.text}")
+                return False
         except Exception as e:
             print(f"   ❌ Błąd: {e}")
             return False

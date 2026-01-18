@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Server Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-slate-800 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fa-brands fa-bitcoin text-2xl text-yellow-500 mr-3"></i>
+                    <span class="font-bold text-xl tracking-tight">Crypto Server Admin</span>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-400">v1.0.0</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-hidden fade-in">
+            
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
+                <h2 class="text-2xl font-bold mb-1">Register New Application</h2>
+                <p class="text-blue-100 text-sm">Create credentials for a new machine-to-machine client.</p>
+            </div>
+
+            <!-- Content -->
+            <div class="p-8">
+                <form id="registerForm" class="space-y-6">
+                    
+                    <!-- App Name -->
+                    <div>
+                        <label for="appName" class="block text-sm font-medium text-gray-700 mb-1">Application Name</label>
+                        <input type="text" id="appName" required placeholder="e.g. Payment Processor v2" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Client ID -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="clientId" class="block text-sm font-medium text-gray-700">Client ID</label>
+                                <button type="button" onclick="generateRandom('clientId', 16)" class="text-xs text-blue-600 hover:text-blue-800 font-semibold">Generate</button>
+                            </div>
+                            <div class="relative">
+                                <input type="text" id="clientId" required 
+                                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                                <i class="fa-solid fa-id-card absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- Client Secret -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="clientSecret" class="block text-sm font-medium text-gray-700">Client Secret</label>
+                                <button type="button" onclick="generateRandom('clientSecret', 32)" class="text-xs text-blue-600 hover:text-blue-800 font-semibold">Generate</button>
+                            </div>
+                            <div class="relative">
+                                <input type="text" id="clientSecret" required 
+                                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                                <i class="fa-solid fa-key absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-gray-200">
+
+                    <!-- Admin Secret -->
+                    <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                        <label for="adminSecret" class="block text-sm font-bold text-yellow-800 mb-1">
+                            <i class="fa-solid fa-shield-halved mr-1"></i> Admin Secret Key
+                        </label>
+                        <p class="text-xs text-yellow-700 mb-2">Required to authorize this registration.</p>
+                        <input type="password" id="adminSecret" required value="super-secret-admin-key"
+                            class="w-full px-4 py-2 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white">
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center justify-end space-x-4 pt-2">
+                        <button type="button" onclick="resetForm()" 
+                            class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors">
+                            Reset
+                        </button>
+                        <button type="submit" id="submitBtn"
+                            class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all transform active:scale-95">
+                            <i class="fa-solid fa-paper-plane mr-2"></i> Register App
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Feedback Message -->
+                <div id="message" class="hidden mt-6 p-4 rounded-lg"></div>
+
+                <!-- Result Card (Hidden by default) -->
+                <div id="resultCard" class="hidden mt-6 bg-slate-50 border border-slate-200 rounded-lg p-4">
+                    <h3 class="text-sm font-bold text-slate-700 mb-2">Registered Successfully!</h3>
+                    <p class="text-xs text-slate-500 mb-3">Copy these credentials and send them to the client securely.</p>
+                    <div class="space-y-2 font-mono text-sm">
+                        <div class="flex justify-between p-2 bg-white border rounded">
+                            <span class="text-gray-500">Client ID:</span>
+                            <span id="resClientId" class="select-all font-semibold text-slate-800"></span>
+                        </div>
+                        <div class="flex justify-between p-2 bg-white border rounded">
+                            <span class="text-gray-500">Client Secret:</span>
+                            <span id="resClientSecret" class="select-all font-semibold text-slate-800"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-800 text-slate-400 py-6 text-center text-sm">
+        <p>&copy; 2026 Crypto Server System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Initialize with random values
+        document.addEventListener('DOMContentLoaded', () => {
+            generateRandom('clientId', 12);
+            generateRandom('clientSecret', 24);
+        });
+
+        function generateRandom(elementId, length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            if(elementId === 'clientId') result = 'client-' + result; 
+            document.getElementById(elementId).value = result;
+        }
+
+        function resetForm() {
+            document.getElementById('registerForm').reset();
+            document.getElementById('message').className = 'hidden mt-6 p-4 rounded-lg';
+            document.getElementById('resultCard').classList.add('hidden');
+            generateRandom('clientId', 12);
+            generateRandom('clientSecret', 24);
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const messageDiv = document.getElementById('message');
+            const resultCard = document.getElementById('resultCard');
+            
+            // UI Loading State
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...';
+            messageDiv.classList.add('hidden');
+            resultCard.classList.add('hidden');
+
+            const payload = {
+                app_name: document.getElementById('appName').value,
+                client_id: document.getElementById('clientId').value,
+                client_secret: document.getElementById('clientSecret').value
+            };
+
+            const adminSecret = document.getElementById('adminSecret').value;
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Secret': adminSecret
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    messageDiv.className = 'mt-6 p-4 rounded-lg bg-green-100 text-green-700 border border-green-200';
+                    messageDiv.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i> ${data.message || 'Registration successful!'}`;
+                    messageDiv.classList.remove('hidden');
+
+                    // Show Result Card
+                    document.getElementById('resClientId').textContent = payload.client_id;
+                    document.getElementById('resClientSecret').textContent = payload.client_secret;
+                    resultCard.classList.remove('hidden');
+                } else {
+                    throw new Error(data.detail || 'Registration failed');
+                }
+            } catch (error) {
+                messageDiv.className = 'mt-6 p-4 rounded-lg bg-red-100 text-red-700 border border-red-200';
+                messageDiv.innerHTML = `<i class="fa-solid fa-circle-exclamation mr-2"></i> ${error.message}`;
+                messageDiv.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i> Register App';
+            }
+        });
+    </script>
+</body>
+</html>

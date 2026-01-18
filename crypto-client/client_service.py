@@ -3,6 +3,7 @@ Serwis obsługujący komunikację z crypto-server
 Implementuje OAuth2 Client Credentials Grant
 """
 import httpx
+import os
 from datetime import datetime, timedelta
 from typing import Optional, Dict, List
 from jose import jwt, JWTError
@@ -16,12 +17,14 @@ class ClientService:
         server_url: str = "http://localhost:8000",
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
-        app_name: str = "Crypto Client App"
+        app_name: str = "Crypto Client App",
+        admin_secret: Optional[str] = None
     ):
         self.server_url = server_url
         self.client_id = client_id or "crypto-client-001"
         self.client_secret = client_secret or "super-secret-key-123"
         self.app_name = app_name
+        self.admin_secret = admin_secret or os.getenv("ADMIN_SECRET", "super-secret-admin-key")
         
         self.access_token: Optional[str] = None
         self.token_expires_at: Optional[datetime] = None
@@ -54,7 +57,11 @@ class ClientService:
             "app_name": self.app_name
         }
         
-        response = await self.http_client.post(url, json=data)
+        headers = {}
+        if self.admin_secret:
+            headers["X-Admin-Secret"] = self.admin_secret
+        
+        response = await self.http_client.post(url, json=data, headers=headers)
         
         if response.status_code == 400:
             # Klient już istnieje

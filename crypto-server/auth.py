@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from jose import jwt
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
+import os
 
 from .database import get_db
 from .models import ClientApp
@@ -18,6 +19,9 @@ router = APIRouter(
 SECRET_KEY = "secret-key-to-sign-tokens"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 120
+
+# Admin secret for registration
+ADMIN_SECRET = os.getenv("ADMIN_SECRET", "super-secret-admin-key")
 
 class ClientCreate(BaseModel):
     client_id: str
@@ -35,9 +39,11 @@ def create_access_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+async def verify_admin_secret(x_admin_secret: str = Header(...)):
+    if x_admin_secret != ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="Nieprawidłowy klucz administratora")
 
-
-@router.post("/register")
+@router.post("/register", dependencies=[Depends(verify_admin_secret)])
 async def register_client(client_data: ClientCreate, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(ClientApp).where(ClientApp.client_id == client_data.client_id))
     if result.scalars().first():
