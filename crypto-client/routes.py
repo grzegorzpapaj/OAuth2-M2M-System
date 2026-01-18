@@ -59,7 +59,12 @@ async def get_token(request: TokenRequest):
     """
     Uzyskaj access token od crypto-server (OAuth2 token endpoint)
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     try:
+        logger.info(f"Próba uzyskania tokenu dla client_id: {request.client_id}")
+        
         # Zaktualizuj credentials w globalnym client service
         _client_service.client_id = request.client_id
         _client_service.client_secret = request.client_secret
@@ -67,12 +72,17 @@ async def get_token(request: TokenRequest):
         # Uzyskaj token od crypto-server
         token = await _client_service.get_access_token()
         
+        logger.info(f"Token uzyskany pomyślnie, długość: {len(token)}")
+        
         return {
             "access_token": token,
             "token_type": "bearer",
             "expires_in": 7200
         }
     except Exception as e:
+        logger.error(f"Błąd podczas uzyskiwania tokenu: {type(e).__name__}: {str(e)}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=401, detail=f"Błąd uwierzytelniania: {str(e)}")
 
 
