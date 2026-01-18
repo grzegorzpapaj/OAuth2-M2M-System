@@ -91,7 +91,8 @@ class ClientService:
         try:
             # Nie weryfikujemy podpisu tutaj, bo to robimy tylko dla czytania exp
             payload = jwt.decode(
-                self.access_token, 
+                self.access_token,
+                key="",  # Pusty klucz gdy verify_signature=False
                 options={"verify_signature": False}
             )
             exp_timestamp = payload.get("exp")
