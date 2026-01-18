@@ -3,11 +3,18 @@ Crypto Client - OAuth2 Client Credentials Grant
 Komunikuje się z crypto-server używając OAuth2
 """
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from .client_service import ClientService
 from .routes import router as client_router, set_client_service
 import asyncio
+import os
 
 app = FastAPI(title="Crypto Client", version="1.0.0")
+
+# Mount static files directory
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # Globalna instancja serwisu klienta
 client_service = ClientService()
@@ -42,7 +49,12 @@ app.include_router(client_router, prefix="/api")
 
 @app.get("/")
 async def root():
-    """Endpoint główny"""
+    """Serwuj frontend HTML"""
+    return FileResponse(os.path.join(static_dir, "index.html"))
+
+@app.get("/api")
+async def api_root():
+    """API endpoint główny"""
     return {
         "message": "Crypto Client is running",
         "authenticated": client_service.is_authenticated(),
