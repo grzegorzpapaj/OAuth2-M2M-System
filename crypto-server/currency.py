@@ -20,7 +20,17 @@ router = APIRouter(
 CURRENCY_NAMES = {
     "BTC": "Bitcoin",
     "ETH": "Ethereum",
-    "SOL": "Solana"
+    "SOL": "Solana",
+    "XRP": "Ripple",
+    "ADA": "Cardano",
+    "DOT": "Polkadot",
+    "LINK": "Chainlink",
+    "LTC": "Litecoin",
+    "BCH": "Bitcoin Cash",
+    "XLM": "Stellar",
+    "UNI": "Uniswap",
+    "DOGE": "Dogecoin",
+    "AVAX": "Avalanche"
 }
 
 # Prosty model Pydantic do wyświetlania danych

@@ -6,17 +6,44 @@ from .models import CurrencyRate
 
 async def currency_generator():
     async with AsyncSessionLocal() as db:
-        # 1. SEEDOWANIE: Sprawdź czy mamy jakieś waluty
-        # Uwaga: przy zmianie nazwy tabeli, tabela będzie pusta na starcie
-        result = await db.execute(select(CurrencyRate))
-        if not result.scalars().first():
-            print("🌱 Inicjalizacja walut startowych (Nowa tabela)...")
-            db.add_all([
-                CurrencyRate(symbol="BTC", rate=45000.0, open_price=45000.0, change_24h=0.0),
-                CurrencyRate(symbol="ETH", rate=3200.0, open_price=3200.0, change_24h=0.0),
-                CurrencyRate(symbol="SOL", rate=144.0, open_price=144.0, change_24h=0.0),
-            ])
+        # 1. SEEDOWANIE: Sprawdź i uzupełnij brakujące waluty
+        print("🌱 Sprawdzanie i seedowanie walut...")
+        
+        initial_currencies = [
+            {"symbol": "BTC", "rate": 45000.0},
+            {"symbol": "ETH", "rate": 3200.0},
+            {"symbol": "SOL", "rate": 144.0},
+            {"symbol": "XRP", "rate": 0.55},
+            {"symbol": "ADA", "rate": 0.50},
+            {"symbol": "DOT", "rate": 7.20},
+            {"symbol": "LINK", "rate": 14.50},
+            {"symbol": "LTC", "rate": 70.00},
+            {"symbol": "BCH", "rate": 250.00},
+            {"symbol": "XLM", "rate": 0.12},
+            {"symbol": "UNI", "rate": 6.50},
+            {"symbol": "DOGE", "rate": 0.08},
+            {"symbol": "AVAX", "rate": 35.00},
+        ]
+
+        new_currencies = []
+        for curr_data in initial_currencies:
+            # Sprawdź czy waluta już istnieje
+            result = await db.execute(select(CurrencyRate).where(CurrencyRate.symbol == curr_data["symbol"]))
+            if not result.scalars().first():
+                print(f"   ➕ Dodawanie nowej waluty: {curr_data['symbol']}")
+                new_currencies.append(
+                    CurrencyRate(
+                        symbol=curr_data["symbol"], 
+                        rate=curr_data["rate"], 
+                        open_price=curr_data["rate"], 
+                        change_24h=0.0
+                    )
+                )
+        
+        if new_currencies:
+            db.add_all(new_currencies)
             await db.commit()
+            print(f"✅ Dodano {len(new_currencies)} nowych walut.")
         
         print("🚀 Start generatora kursów (Persistent DB Mode)!")
 
