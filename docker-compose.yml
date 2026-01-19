@@ -12,6 +12,43 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crypto-server"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: .
+      dockerfile: crypto-server/Dockerfile
+    container_name: crypto-server
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://crypto-server:postgres@db:5432/crypto-server-db
+      - ADMIN_SECRET=super-secret-admin-key
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./crypto-server:/app/crypto-server
+
+  client:
+    build:
+      context: .
+      dockerfile: crypto-client/Dockerfile
+    container_name: crypto-client
+    restart: always
+    ports:
+      - "8001:8001"
+    environment:
+      - CRYPTO_SERVER_URL=http://server:8000
+    depends_on:
+      - server
+    volumes:
+      - ./crypto-client:/app/crypto-client
 
 volumes:
   postgres_data:

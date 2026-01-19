@@ -24,6 +24,10 @@ app.include_router(currency_router, prefix="/api")
 
 app.mount("/static", StaticFiles(directory="crypto-server/static"), name="static")
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "service": "crypto-server"}
+
 @app.get("/")
 async def root():
     return FileResponse("crypto-server/static/index.html")

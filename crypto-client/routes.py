@@ -4,6 +4,7 @@ Endpointy FastAPI dla crypto-client
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
+from datetime import datetime
 
 router = APIRouter(tags=["Client Operations"])
 
@@ -26,6 +27,9 @@ class CurrencyRateResponse(BaseModel):
     """Model odpowiedzi z kursem waluty"""
     symbol: str
     rate: float
+    name: str
+    change_24h: float
+    updated_at: datetime
 
 
 # Będzie zaimportowany w main.py

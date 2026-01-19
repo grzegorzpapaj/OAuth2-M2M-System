@@ -14,13 +14,13 @@ class ClientService:
     
     def __init__(
         self, 
-        server_url: str = "http://localhost:8000",
+        server_url: Optional[str] = None,
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
         app_name: str = "Crypto Client App",
         admin_secret: Optional[str] = None
     ):
-        self.server_url = server_url
+        self.server_url = server_url or os.getenv("CRYPTO_SERVER_URL", "http://localhost:8000")
         self.client_id = client_id or "crypto-client-001"
         self.client_secret = client_secret or "super-secret-key-123"
         self.app_name = app_name
@@ -153,7 +153,7 @@ class ClientService:
     
     async def test_connection(self) -> Dict:
         """Testuj połączenie z serwerem"""
-        url = f"{self.server_url}/"
+        url = f"{self.server_url}/health"
         response = await self.http_client.get(url)
         response.raise_for_status()
         return response.json()
