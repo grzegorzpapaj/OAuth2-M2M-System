@@ -8,7 +8,6 @@ import random
 
 from .database import get_db
 from .models import CurrencyRate, ClientApp
-# Importujemy naszą kłódkę z auth.py
 from .auth import get_current_client
 
 router = APIRouter(
@@ -16,7 +15,6 @@ router = APIRouter(
     tags=["Currency Rates"]
 )
 
-# Mapa nazw
 CURRENCY_NAMES = {
     "BTC": "Bitcoin",
     "ETH": "Ethereum",
@@ -33,7 +31,6 @@ CURRENCY_NAMES = {
     "AVAX": "Avalanche"
 }
 
-# Prosty model Pydantic do wyświetlania danych
 class CurrencyResponse(BaseModel):
     symbol: str
     rate: float
@@ -55,26 +52,25 @@ def map_currency_to_response(currency: CurrencyRate) -> CurrencyResponse:
 
 @router.get("/", response_model=List[CurrencyResponse])
 async def get_all_rates(
-    db: AsyncSession = Depends(get_db), 
+    db: AsyncSession = Depends(get_db),
     current_client: ClientApp = Depends(get_current_client)
 ):
-    # Logika biznesowa: pobierz wszystkie waluty
     result = await db.execute(select(CurrencyRate))
     rates = result.scalars().all()
-    
+
     return [map_currency_to_response(rate) for rate in rates]
 
 @router.get("/{symbol}", response_model=CurrencyResponse)
 async def get_single_rate(
-    symbol: str, 
+    symbol: str,
     db: AsyncSession = Depends(get_db),
     current_client: ClientApp = Depends(get_current_client)
 ):
     result = await db.execute(select(CurrencyRate).where(CurrencyRate.symbol == symbol.upper()))
     rate = result.scalars().first()
-    
+
     if not rate:
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Waluta nie znaleziona")
-        
+
     return map_currency_to_response(rate)

@@ -6,9 +6,8 @@ from .models import CurrencyRate
 
 async def currency_generator():
     async with AsyncSessionLocal() as db:
-        # 1. SEEDOWANIE: Sprawdź i uzupełnij brakujące waluty
         print("🌱 Sprawdzanie i seedowanie walut...")
-        
+
         initial_currencies = [
             {"symbol": "BTC", "rate": 45000.0},
             {"symbol": "ETH", "rate": 3200.0},
@@ -27,48 +26,39 @@ async def currency_generator():
 
         new_currencies = []
         for curr_data in initial_currencies:
-            # Sprawdź czy waluta już istnieje
             result = await db.execute(select(CurrencyRate).where(CurrencyRate.symbol == curr_data["symbol"]))
             if not result.scalars().first():
                 print(f"   ➕ Dodawanie nowej waluty: {curr_data['symbol']}")
                 new_currencies.append(
                     CurrencyRate(
-                        symbol=curr_data["symbol"], 
-                        rate=curr_data["rate"], 
-                        open_price=curr_data["rate"], 
+                        symbol=curr_data["symbol"],
+                        rate=curr_data["rate"],
+                        open_price=curr_data["rate"],
                         change_24h=0.0
                     )
                 )
-        
+
         if new_currencies:
             db.add_all(new_currencies)
             await db.commit()
             print(f"✅ Dodano {len(new_currencies)} nowych walut.")
-        
+
         print("🚀 Start generatora kursów (Persistent DB Mode)!")
 
-        # 2. PĘTLA NIESKOŃCZONA (Symulacja rynku)
         while True:
-            # Pobierz wszystkie waluty
             result = await db.execute(select(CurrencyRate))
             rates = result.scalars().all()
 
-            # Zmień kurs każdej waluty
             for currency in rates:
-                # Jeśli z jakiegoś powodu open_price jest null (np. stare dane), napraw to
                 if currency.open_price is None:
                     currency.open_price = currency.rate
 
-                # Zmiana ceny
-                change_percent = random.uniform(-0.005, 0.005) 
+                change_percent = random.uniform(-0.005, 0.005)
                 currency.rate = currency.rate * (1 + change_percent)
-                
-                # Oblicz i zapisz zmianę 24h w bazie
+
                 if currency.open_price > 0:
                     currency.change_24h = ((currency.rate - currency.open_price) / currency.open_price) * 100
-            
-            # Zapisz wszystkie zmiany w bazie
+
             await db.commit()
-            
-            # Czekaj 3 sekundy
+
             await asyncio.sleep(3)

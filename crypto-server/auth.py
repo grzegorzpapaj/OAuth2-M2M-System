@@ -20,7 +20,6 @@ SECRET_KEY = "secret-key-to-sign-tokens"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 120
 
-# Admin secret for registration
 ADMIN_SECRET = os.getenv("ADMIN_SECRET", "super-secret-admin-key")
 
 class ClientCreate(BaseModel):
@@ -78,9 +77,8 @@ async def get_current_client(token: str = Depends(oauth2_scheme), db: AsyncSessi
         detail="Token jest nieważny lub wygasł",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
+
     try:
-        # Dekodujemy token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         client_id: str = payload.get("sub")
         if client_id is None:
@@ -88,11 +86,10 @@ async def get_current_client(token: str = Depends(oauth2_scheme), db: AsyncSessi
     except JWTError:
         raise credentials_exception
 
-    # Opcjonalnie: sprawdzamy czy klient nadal istnieje w bazie
     result = await db.execute(select(ClientApp).where(ClientApp.client_id == client_id))
     client = result.scalars().first()
-    
+
     if client is None:
         raise credentials_exception
-        
+
     return client

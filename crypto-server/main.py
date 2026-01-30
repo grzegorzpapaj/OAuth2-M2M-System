@@ -4,13 +4,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from .database import engine, Base
 
-from .auth import router as auth_router 
+from .auth import router as auth_router
 from .currency import router as currency_router
 from .tasks import currency_generator
 
 app = FastAPI()
 
-# --- STARTUP ---
 @app.on_event("startup")
 async def startup():
     async with engine.begin() as conn:

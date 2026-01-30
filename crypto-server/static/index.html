@@ -22,7 +22,6 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- Navbar -->
     <nav class="bg-slate-800 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -37,49 +36,43 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="flex-grow flex items-center justify-center p-6">
         <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-hidden fade-in">
-            
-            <!-- Header -->
+
             <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
                 <h2 class="text-2xl font-bold mb-1">Register New Application</h2>
                 <p class="text-blue-100 text-sm">Create credentials for a new machine-to-machine client.</p>
             </div>
 
-            <!-- Content -->
             <div class="p-8">
                 <form id="registerForm" class="space-y-6">
-                    
-                    <!-- App Name -->
+
                     <div>
                         <label for="appName" class="block text-sm font-medium text-gray-700 mb-1">Application Name</label>
-                        <input type="text" id="appName" required placeholder="e.g. Payment Processor v2" 
+                        <input type="text" id="appName" required placeholder="e.g. Payment Processor v2"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Client ID -->
                         <div>
                             <div class="flex justify-between items-center mb-1">
                                 <label for="clientId" class="block text-sm font-medium text-gray-700">Client ID</label>
                                 <button type="button" onclick="generateRandom('clientId', 16)" class="text-xs text-blue-600 hover:text-blue-800 font-semibold">Generate</button>
                             </div>
                             <div class="relative">
-                                <input type="text" id="clientId" required 
+                                <input type="text" id="clientId" required
                                     class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
                                 <i class="fa-solid fa-id-card absolute left-3 top-3 text-gray-400"></i>
                             </div>
                         </div>
 
-                        <!-- Client Secret -->
                         <div>
                             <div class="flex justify-between items-center mb-1">
                                 <label for="clientSecret" class="block text-sm font-medium text-gray-700">Client Secret</label>
                                 <button type="button" onclick="generateRandom('clientSecret', 32)" class="text-xs text-blue-600 hover:text-blue-800 font-semibold">Generate</button>
                             </div>
                             <div class="relative">
-                                <input type="text" id="clientSecret" required 
+                                <input type="text" id="clientSecret" required
                                     class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
                                 <i class="fa-solid fa-key absolute left-3 top-3 text-gray-400"></i>
                             </div>
@@ -88,7 +81,6 @@
 
                     <hr class="border-gray-200">
 
-                    <!-- Admin Secret -->
                     <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
                         <label for="adminSecret" class="block text-sm font-bold text-yellow-800 mb-1">
                             <i class="fa-solid fa-shield-halved mr-1"></i> Admin Secret Key
@@ -98,9 +90,8 @@
                             class="w-full px-4 py-2 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white">
                     </div>
 
-                    <!-- Action Buttons -->
                     <div class="flex items-center justify-end space-x-4 pt-2">
-                        <button type="button" onclick="resetForm()" 
+                        <button type="button" onclick="resetForm()"
                             class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors">
                             Reset
                         </button>
@@ -111,10 +102,8 @@
                     </div>
                 </form>
 
-                <!-- Feedback Message -->
                 <div id="message" class="hidden mt-6 p-4 rounded-lg"></div>
 
-                <!-- Result Card (Hidden by default) -->
                 <div id="resultCard" class="hidden mt-6 bg-slate-50 border border-slate-200 rounded-lg p-4">
                     <h3 class="text-sm font-bold text-slate-700 mb-2">Registered Successfully!</h3>
                     <p class="text-xs text-slate-500 mb-3">Copy these credentials and send them to the client securely.</p>
@@ -139,7 +128,6 @@
     </footer>
 
     <script>
-        // Initialize with random values
         document.addEventListener('DOMContentLoaded', () => {
             generateRandom('clientId', 12);
             generateRandom('clientSecret', 24);
@@ -151,7 +139,7 @@
             for (let i = 0; i < length; i++) {
                 result += chars.charAt(Math.floor(Math.random() * chars.length));
             }
-            if(elementId === 'clientId') result = 'client-' + result; 
+            if(elementId === 'clientId') result = 'client-' + result;
             document.getElementById(elementId).value = result;
         }
 
@@ -165,12 +153,11 @@
 
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const submitBtn = document.getElementById('submitBtn');
             const messageDiv = document.getElementById('message');
             const resultCard = document.getElementById('resultCard');
-            
-            // UI Loading State
+
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...';
             messageDiv.classList.add('hidden');
@@ -201,7 +188,6 @@
                     messageDiv.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i> ${data.message || 'Registration successful!'}`;
                     messageDiv.classList.remove('hidden');
 
-                    // Show Result Card
                     document.getElementById('resClientId').textContent = payload.client_id;
                     document.getElementById('resClientSecret').textContent = payload.client_secret;
                     resultCard.classList.remove('hidden');
