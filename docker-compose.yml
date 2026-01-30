@@ -49,6 +49,8 @@ services:
       - server
     volumes:
       - ./crypto-client:/app/crypto-client
+      - client_data:/app/data  # SQLite database persistence
 
 volumes:
   postgres_data:
+  client_data:

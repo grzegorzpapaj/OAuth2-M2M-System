@@ -7,6 +7,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from .client_service import ClientService
 from .routes import router as client_router, set_client_service
+from .user_routes import router as user_router
+from .database import db
 import asyncio
 import os
 
@@ -22,10 +24,19 @@ client_service = ClientService()
 # Ustaw w routes
 set_client_service(client_service)
 
+# Dodaj router z endpointami
+app.include_router(client_router, prefix="/api")
+app.include_router(user_router, prefix="/api")  # User authentication routes
+
 @app.on_event("startup")
 async def startup():
     """Inicjalizacja klienta przy starcie"""
     print("🚀 Uruchamianie Crypto Client...")
+    
+    # Initialize database
+    print("📊 Initializing user database...")
+    db.init_db()
+    db.cleanup_expired_sessions()
     
     # Próba zalogowania przy starcie
     try:
@@ -33,7 +44,7 @@ async def startup():
         print("✅ Klient uwierzytelniony i gotowy!")
     except Exception as e:
         print(f"⚠️  Nie udało się uwierzytelnić przy starcie: {e}")
-        print("💡 Użyj endpointu /register lub /login aby się uwierzytelnić")
+        print("💡 Użytkownicy muszą się zalogować przez frontend")
     
     # Opcjonalnie: uruchom task pobierający kursy w tle
     asyncio.create_task(background_currency_fetcher())
@@ -44,13 +55,20 @@ async def shutdown():
     await client_service.close()
     print("👋 Crypto Client zatrzymany")
 
-# Dodaj router z endpointami
-app.include_router(client_router, prefix="/api")
-
 @app.get("/")
 async def root():
-    """Serwuj frontend HTML"""
-    return FileResponse(os.path.join(static_dir, "index.html"))
+    """Serwuj nowy frontend HTML z user authentication"""
+    return FileResponse(os.path.join(static_dir, "dashboard.html"))
+
+@app.get("/admin")
+async def admin():
+    """Serwuj admin dashboard dla M2M configuration"""
+    return FileResponse(os.path.join(static_dir, "admin.html"))
+
+@app.get("/register")
+async def register_page():
+    """Serwuj stronę rejestracji"""
+    return FileResponse(os.path.join(static_dir, "register.html"))
 
 @app.get("/api")
 async def api_root():

@@ -14,12 +14,13 @@ class ClientService:
     
     def __init__(
         self, 
-        server_url: Optional[str] = None,
+        server_url: str = None,
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
         app_name: str = "Crypto Client App",
         admin_secret: Optional[str] = None
     ):
+        # Use environment variable or default to localhost
         self.server_url = server_url or os.getenv("CRYPTO_SERVER_URL", "http://localhost:8000")
         self.client_id = client_id or "crypto-client-001"
         self.client_secret = client_secret or "super-secret-key-123"

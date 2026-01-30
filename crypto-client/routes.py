@@ -1,7 +1,7 @@
 """
 Endpointy FastAPI dla crypto-client
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Cookie, Depends
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
@@ -40,6 +40,22 @@ def set_client_service(service):
     """Ustaw globalny client service"""
     global _client_service
     _client_service = service
+
+
+# Dependency for user authentication
+async def get_current_user(session_token: Optional[str] = Cookie(None)):
+    """Dependency to verify user session"""
+    from .database import db
+    
+    if not session_token:
+        raise HTTPException(status_code=401, detail="Not authenticated - please login first")
+    
+    user = db.verify_session(session_token)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid or expired session - please login again")
+    
+    return user
 
 
 @router.post("/register")
@@ -127,12 +143,17 @@ async def get_status():
 
 
 @router.get("/currencies", response_model=List[CurrencyRateResponse])
-async def get_all_currencies():
+async def get_all_currencies(user: dict = Depends(get_current_user)):
     """
     Pobierz wszystkie kursy walut z crypto-server
-    Wymaga uwierzytelnienia
+    Wymaga uwierzytelnienia użytkownika
     """
     try:
+        # Use user's client credentials for M2M OAuth2
+        if user.get("client_id") and user.get("client_secret"):
+            _client_service.client_id = user["client_id"]
+            _client_service.client_secret = user["client_secret"]
+        
         rates = await _client_service.get_all_currency_rates()
         return rates
     except Exception as e:
@@ -143,12 +164,17 @@ async def get_all_currencies():
 
 
 @router.get("/currencies/{symbol}", response_model=CurrencyRateResponse)
-async def get_currency(symbol: str):
+async def get_currency(symbol: str, user: dict = Depends(get_current_user)):
     """
     Pobierz kurs konkretnej waluty z crypto-server
-    Wymaga uwierzytelnienia
+    Wymaga uwierzytelnienia użytkownika
     """
     try:
+        # Use user's client credentials for M2M OAuth2
+        if user.get("client_id") and user.get("client_secret"):
+            _client_service.client_id = user["client_id"]
+            _client_service.client_secret = user["client_secret"]
+        
         rate = await _client_service.get_currency_rate(symbol)
         return rate
     except Exception as e:

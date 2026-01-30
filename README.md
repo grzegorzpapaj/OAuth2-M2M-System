@@ -1,6 +1,6 @@
-# OAuth2 M2M System
+# OAuth2 M2M System with User Authentication
 
-System komunikacji Machine-to-Machine (M2M) wykorzystujący **OAuth2 Client Credentials Grant** zbudowany w FastAPI.
+System komunikacji Machine-to-Machine (M2M) wykorzystujący **OAuth2 Client Credentials Grant** z **dwupoziomową autentykacją użytkowników** zbudowany w FastAPI.
 
 ## 📋 Opis projektu
 
@@ -9,45 +9,66 @@ Projekt składa się z dwóch komponentów:
 ### 🔐 **Crypto-Server**
 Serwer API dostarczający:
 - OAuth2 uwierzytelnianie (Client Credentials Grant)
-- JWT tokeny
+- JWT tokeny dla M2M
 - Chronione endpointy z kursami kryptowalut
 - Background task aktualizujący kursy co 3 sekundy
+- PostgreSQL database
 
-### 💻 **Crypto-Client**
+### 💻 **Crypto-Client** 
 Klient implementujący:
-- **Frontend webowy** - nowoczesny interfejs do logowania i przeglądania kursów
-- Automatyczna rejestracja w serwerze (backend)
+- **User Authentication** - logowanie username/password z sesjami (SQLite)
+- **Frontend webowy** - nowoczesny dashboard z live aktualizacją kursów
+- **M2M OAuth2** - automatyczna komunikacja z crypto-server
 - Uzyskiwanie i odświeżanie JWT tokenów
-- Komunikację z chronionymi endpointami
 - Background task pobierający dane co 10 sekund
 
-## 🚀 Szybki start
+## 🏗️ Architektura Dwupoziomowa
 
-### Wymagania
-- Python 3.10+
-- Docker & Docker Compose
-- pip
-
-### 1. Klonowanie i instalacja
-
-```bash
-# Przejdź do katalogu projektu
-cd OAuth2-M2M-System
-
-# Zainstaluj zależności serwera
-pip3 install -r crypto-server/requirements.txt
-
-# Zainstaluj zależności klienta
-pip3 install -r crypto-client/requirements.txt
+```
+Browser → [User Auth] → Crypto-Client → [M2M OAuth2] → Crypto-Server
+          (username/pw)   (SQLite)        (client_id)     (PostgreSQL)
 ```
 
-### 2. Uruchomienie bazy danych
+## 🚀 Szybki start (Docker - ZALECANE)
+
+### Wymagania
+- Docker & Docker Compose
+
+### 1. Uruchomienie systemu
 
 ```bash
+cd OAuth2-M2M-System
 docker-compose up -d
 ```
 
-### 3. Uruchomienie Crypto-Server
+### 2. Utworzenie użytkownika
+
+```bash
+./create-user-docker.sh
+```
+
+### 3. Logowanie
+
+Otwórz: **http://localhost:8001**
+
+Zaloguj się używając utworzonego username i hasła.
+
+---
+
+## 📚 Dokumentacja
+
+- **[DOCKER_GUIDE.md](DOCKER_GUIDE.md)** - 🐳 Kompletny przewodnik Docker (ROZPOCZNIJ TUTAJ)
+- **[USER_AUTH_GUIDE.md](USER_AUTH_GUIDE.md)** - 🔐 System autentykacji użytkowników
+- **[QUICKSTART.md](QUICKSTART.md)** - ⚡ Szybki start (bez Dockera)
+- **[FRONTEND_GUIDE.md](FRONTEND_GUIDE.md)** - 🎨 Przewodnik frontendu
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - 🏗️ Architektura systemu
+- **[ENDPOINTS.md](ENDPOINTS.md)** - 📡 Dokumentacja API
+
+---
+
+## 🐳 Docker (Zalecane)
+
+### Uruchomienie
 
 ```bash
 # Opcja 1: Przez skrypt
